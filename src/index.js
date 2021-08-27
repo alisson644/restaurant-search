@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import '@material/react-text-field/dist/text-field.css';
+
+
 import App from './App';
 
 
