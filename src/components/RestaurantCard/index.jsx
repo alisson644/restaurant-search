@@ -4,13 +4,13 @@ import restaurante from '../../assets/restaurante-fake.png'
 
 import { Restaurant, RestaurantInfo, Title, Address, RestaurantPhoto } from './styles'
 
-export default ()=> (
-  <Restaurant>
+export default ({restaurant})=> (
+  <Restaurant key={restaurant.place_id} >
     <RestaurantInfo>
-      <Title>Nome do Restaurante</Title>
-      <ReactStars count={5} isHalf value={4} edit={false} activeColor="#e7711c" />
-      <Address>Rua dos bobos número 0</Address>
+      <Title>{restaurant.name}</Title>
+      <ReactStars count={5} isHalf value={restaurant.rating} edit={false} activeColor="#e7711c" />
+      <Address>{restaurant.vicinity || restaurant.formatted_address}</Address>
     </RestaurantInfo>
-    <RestaurantPhoto src={restaurante} alt="Foto restaurante"/>
+    <RestaurantPhoto  src={restaurant.photos ? restaurant.photos[0].getUrl() : restaurante} alt="Foto restaurante"/>
   </Restaurant>
   );
