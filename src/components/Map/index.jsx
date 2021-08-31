@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoogleApiWrapper, Map, Marker } from 'google-maps-react';
 
-import { setRestaurants } from '../../redux/modules/restaurants'
+import { setRestaurants, setRestaurant } from '../../redux/modules/restaurants'
 
 
 export const MapContainer = (props) => {
   const dispatch = useDispatch();
   const restaurants = useSelector((state) => state.restaurants.restaurants);
   const [map, setMap] = useState(null)
-  const { google, query } = props;
+  const { google, query, placeId } = props;
 
   useEffect(()=> {
     if(query){
@@ -17,15 +17,38 @@ export const MapContainer = (props) => {
     }
   },[query]);
 
-  function searchByQuery(query) {
+  useEffect(()=> {
+    if(placeId){
+      getRestaurantById(placeId);
+    }
+  },[placeId]);
+
+  function getRestaurantById(placeId){
     const service = new google.maps.places.PlacesService(map);
 
+    dispatch(setRestaurant(null));
+
+    const request = {
+      placeId,
+      fields: ['name', 'opening_hours', 'formatted_address', 'formatted_phone_number'],
+    };
+
+    service.getDetails(request, (place, status) => {
+      if(status === google.maps.places.PlacesServiceStatus.OK){
+        dispatch(setRestaurant(place));
+      }
+    });
+  }
+
+  function searchByQuery(query) {
+    const service = new google.maps.places.PlacesService(map);
     const request = {
       location: map.center,
       radius: '200',
       type: ['restaurant'],
       query
     };
+    dispatch(setRestaurant([]));
 
     service.nearbySearch(request, (results, status) => {
       if(status === google.maps.places.PlacesServiceStatus.OK){
@@ -36,7 +59,7 @@ export const MapContainer = (props) => {
 
   function searchNearby(map, center) {
     const service = new google.maps.places.PlacesService(map);
-
+    dispatch(setRestaurant([]));
     const request = {
       location: center,
       radius: '20000',
@@ -55,8 +78,8 @@ export const MapContainer = (props) => {
     searchNearby(map, map.center);
   }
   return (
-    <Map google={google} centerAroundCurrentLocation onReady={onMapReady} onRecenter={onMapReady}>
-      {restaurants.map((restaurant) => {
+    <Map google={google} centerAroundCurrentLocation onReady={onMapReady} onRecenter={onMapReady} {...props}>
+      {restaurants && restaurants.map((restaurant) => {
         return (<Marker 
           key={restaurant.place_id} 
           name={restaurant.name} 

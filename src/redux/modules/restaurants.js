@@ -5,15 +5,15 @@ export const Types ={
 
 const initialState = { 
   restaurants: [],
-  restaurantSelected: null,
+  restaurantSelected: {},
 };
 
 export default function reducer(state= initialState, action) {
   switch (action.type) {
     case Types.SET_RESTAURANTS:
-      return { ...state, restaurants: action.payload}
+      return { ...state, restaurants: action.payload.restaurants}
     case Types.SET_RESTAURANT:
-      return { ...state, restaurants: action.payload}
+      return { ...state, restaurantSelected: action.payload}
     default:
       return state;
   }
